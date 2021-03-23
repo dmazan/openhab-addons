@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.isy.config.IsyInsteonDeviceConfiguration;
 import org.openhab.binding.isy.internal.NodeAddress;
 import org.openhab.binding.isy.internal.OHIsyClient;
@@ -41,7 +42,7 @@ public class IsyDeviceHandler extends AbtractIsyThingHandler {
 
     protected Map<Integer, String> mDeviceidToChannelMap = new HashMap<Integer, String>();
 
-    private String mControlUID = null;
+    private @NonNull String mControlUID = "";
 
     // most devices only have one device id, which is 1. so if map is empty, we'll return 1
     protected int getDeviceIdForChannel(String channel) {
@@ -79,8 +80,8 @@ public class IsyDeviceHandler extends AbtractIsyThingHandler {
             } else {
                 newState = IsyDeviceHandler.statusValuetoState(newIntState);
             }
-            updateState(mDeviceidToChannelMap.get(deviceId), newState);
-        } else if (mControlUID != null && ("DOF".equals(control) || "DFOF".equals(control) || "DON".equals(control)
+            updateState(mDeviceidToChannelMap.getOrDefault(deviceId, ""), newState);
+        } else if (mControlUID != "" && ("DOF".equals(control) || "DFOF".equals(control) || "DON".equals(control)
                 || "DFON".equals(control))) {
             if (deviceId == 1) {
                 updateState(mControlUID, new StringType(control));
@@ -99,7 +100,7 @@ public class IsyDeviceHandler extends AbtractIsyThingHandler {
     }
 
     @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
+    public void handleCommand(@Nullable ChannelUID channelUID, Command command) {
         logger.debug("handle command, channel: {}, command: {}", channelUID, command);
 
         IsyBridgeHandler bridgeHandler = getBridgeHandler();
@@ -170,7 +171,6 @@ public class IsyDeviceHandler extends AbtractIsyThingHandler {
         super.bridgeStatusChanged(bridgeStatusInfo);
     }
 
-    @SuppressWarnings("null")
     @Override
     public void initialize() {
         // device update is changed on first update or refresh, when comm is confirmed

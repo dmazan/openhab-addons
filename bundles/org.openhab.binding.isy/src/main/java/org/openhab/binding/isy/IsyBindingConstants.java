@@ -65,6 +65,8 @@ public class IsyBindingConstants {
     public final static String CHANNEL_CONTROL_ACTION = "control";
 
     public final static String CHANNEL_SWITCH = "state";
+    public final static String CHANNEL_SWITCH1 = "state1";
+    public final static String CHANNEL_SWITCH2 = "state2";
     // motion
     public final static String CHANNEL_MOTION_MOTION = "motion";
     public final static String CHANNEL_MOTION_DUSK = "dusk_dawn";

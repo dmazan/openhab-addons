@@ -83,8 +83,8 @@ public class IsyHandlerFactory extends BaseThingHandlerFactory {
         } else if (thingTypeUID.equals(VARIABLE_THING_TYPE)) {
             return new IsyVariableHandler(thing);
         } else if (thingTypeUID.equals(OUTLETLINC_DUAL_THING_TYPE)) {
-            return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_SWITCH, 1)
-                    .addChannelforDeviceId(CHANNEL_SWITCH, 2).build();
+            return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_SWITCH1, 1)
+                    .addChannelforDeviceId(CHANNEL_SWITCH2, 2).build();
         } else if (thingTypeUID.equals(MOTION_THING_TYPE)) {
             return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_MOTION_MOTION, 1)
                     .addChannelforDeviceId(CHANNEL_MOTION_DUSK, 2).addChannelforDeviceId(CHANNEL_MOTION_BATTERY, 3)

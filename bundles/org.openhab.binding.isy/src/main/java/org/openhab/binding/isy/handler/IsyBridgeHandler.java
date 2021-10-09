@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 public class IsyBridgeHandler extends BaseBridgeHandler implements InsteonClientProvider {
     private String testXmlVariableUpdate = "<?xml version=\"1.0\"?><Event seqnum=\"1607\" sid=\"uuid:74\"><control>_1</control><action>6</action><node></node><eventInfo><var type=\"2\" id=\"3\"><val>0</val><ts>20170718 09:16:26</ts></var></eventInfo></Event>";
@@ -84,6 +85,7 @@ public class IsyBridgeHandler extends BaseBridgeHandler implements InsteonClient
         super(bridge);
 
         xStream = new XStream(new StaxDriver());
+        xStream.addPermission(AnyTypePermission.ANY);
         xStream.ignoreUnknownElements();
         xStream.setClassLoader(IsyRestDiscoveryService.class.getClassLoader());
         xStream.processAnnotations(new Class[] { Properties.class, Property.class, Event.class, EventInfo.class,

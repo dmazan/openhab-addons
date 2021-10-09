@@ -14,6 +14,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.client.ClientBuilder;
+
 import org.openhab.binding.isy.discovery.IsyRestDiscoveryService;
 import org.openhab.binding.isy.handler.special.VenstarThermostatDeviceHandler;
 import org.openhab.core.config.discovery.DiscoveryService;
@@ -25,7 +27,10 @@ import org.openhab.core.thing.binding.BaseThingHandlerFactory;
 import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerFactory;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.client.SseEventSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +56,16 @@ public class IsyHandlerFactory extends BaseThingHandlerFactory {
 
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegistrations = new HashMap<ThingUID, ServiceRegistration<?>>();
 
+    private final ClientBuilder clientBuilder;
+    private final SseEventSourceFactory eventSourceFactory;
+
+    @Activate
+    public IsyHandlerFactory(@Reference ClientBuilder clientBuilder,
+            @Reference SseEventSourceFactory eventSourceFactory) {
+        this.clientBuilder = clientBuilder;
+        this.eventSourceFactory = eventSourceFactory;
+    }
+
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
         return SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
@@ -68,8 +83,8 @@ public class IsyHandlerFactory extends BaseThingHandlerFactory {
         } else if (thingTypeUID.equals(VARIABLE_THING_TYPE)) {
             return new IsyVariableHandler(thing);
         } else if (thingTypeUID.equals(OUTLETLINC_DUAL_THING_TYPE)) {
-            return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_SWITCH, 1)
-                    .addChannelforDeviceId(CHANNEL_SWITCH, 2).build();
+            return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_SWITCH1, 1)
+                    .addChannelforDeviceId(CHANNEL_SWITCH2, 2).build();
         } else if (thingTypeUID.equals(MOTION_THING_TYPE)) {
             return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_MOTION_MOTION, 1)
                     .addChannelforDeviceId(CHANNEL_MOTION_DUSK, 2).addChannelforDeviceId(CHANNEL_MOTION_BATTERY, 3)
@@ -127,7 +142,7 @@ public class IsyHandlerFactory extends BaseThingHandlerFactory {
             return IsyHandlerBuilder.builder(thing).addChannelforDeviceId(CHANNEL_SWITCH, 1)
                     .addChannelforDeviceId(CHANNEL_SWITCH, 2).build();
         } else if (thingTypeUID.equals(THING_TYPE_ISYBRIDGE)) {
-            IsyBridgeHandler handler = new IsyBridgeHandler((Bridge) thing);
+            IsyBridgeHandler handler = new IsyBridgeHandler((Bridge) thing, clientBuilder, eventSourceFactory);
             registerIsyBridgeDiscoveryService(handler);
             return handler;
         }
@@ -141,7 +156,8 @@ public class IsyHandlerFactory extends BaseThingHandlerFactory {
      * @param isyBridgeBridgeHandler
      */
     private void registerIsyBridgeDiscoveryService(IsyBridgeHandler isyBridgeBridgeHandler) {
-        IsyRestDiscoveryService discoveryService = new IsyRestDiscoveryService(isyBridgeBridgeHandler);
+        IsyRestDiscoveryService discoveryService = new IsyRestDiscoveryService(isyBridgeBridgeHandler, clientBuilder,
+                eventSourceFactory);
 
         ServiceRegistration<?> discoveryServiceRegistration = bundleContext
                 .registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<String, Object>());

@@ -229,7 +229,7 @@
 	</thing-type>
 	<thing-type id="leakdetector">
 		<supported-bridge-type-refs>
-			<bridge-type-ref id="ipbridge"/>
+			<bridge-type-ref id="isyBridge"/>
 		</supported-bridge-type-refs>
 
 		<label>Leak Detector</label>
@@ -338,8 +338,8 @@
 		<label>Dual Outlook Linc</label>
 		<description>Dual Outlook Linc</description>
 		<channels>
-			<channel id="loadlevel1" typeId="loadLevel"/>
-			<channel id="loadlevel2" typeId="loadLevel"/>
+			<channel id="state1" typeId="switchState"/>
+			<channel id="state2" typeId="switchState"/>
 		</channels>
 		<config-description>
 			<parameter name="address" type="text" required="true">
